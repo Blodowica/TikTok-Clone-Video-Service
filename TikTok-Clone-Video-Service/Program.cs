@@ -1,4 +1,6 @@
 
+using TikTok_Clone_User_Service.Services;
+
 namespace TikTok_Clone_Video_Service
 {
     public class Program
@@ -13,6 +15,10 @@ namespace TikTok_Clone_Video_Service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddLogging();
+            builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
+
+
 
             var app = builder.Build();
 
