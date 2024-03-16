@@ -20,12 +20,12 @@ namespace TikTok_Clone_User_Service.Services
         {
             _connectionFactory = new ConnectionFactory
             {
-                HostName = "172.17.0.3", // Replace with your RabbitMQ Docker container IP address
+                HostName = "172.17.0.1", // Replace with your RabbitMQ Docker container IP address
                 Port = 5672,              // RabbitMQ default port
                 UserName = "guest",
                 Password = "guest"
             };
-            _queueName = "queue_test1";
+            _queueName = "UserPublishQueue";
         }
 
         public List<string> ReadAllMessages()

@@ -9,11 +9,11 @@ namespace TikTok_Clone_Video_Service.Controllers
     public class RabbitMQConsumerController : ControllerBase
     {
         private readonly IRabbitMQConsumerService _consumerService;
-        private readonly ILogger _logger;
+       
 
-        public RabbitMQConsumerController(ILogger<RabbitMQConsumerController> logger, IRabbitMQConsumerService consumerService)
+        public RabbitMQConsumerController( IRabbitMQConsumerService consumerService)
         {
-            _logger = logger;
+          
             _consumerService = consumerService;
         }
 
