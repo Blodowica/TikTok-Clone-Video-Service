@@ -1,4 +1,8 @@
 
+using CloudinaryDotNet;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Security.Principal;
 using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.Controllers;
 using TikTok_Clone_Video_Service.DatabaseContext;
@@ -21,11 +25,29 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddLogging();
             builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
             builder.Services.AddScoped<IRabbitMQPublisherService, RabbitMQPublisherService>();
+            builder.Services.AddDbContext<VideoDatabaseContext>();
+
+            
+
+            //Db context
 
             using (var client = new VideoDatabaseContext())
             {
                 client.Database.EnsureCreated();
             }
+
+
+            //Cloudindary
+            var account =( new Account(
+              builder.Configuration["CloudinarySettings:CloudName"],
+              builder.Configuration["CloudinarySettings:ApiKey"],
+              builder.Configuration["CloudinarySettings:ApiSecret"]));
+
+            var cloudinary = new Cloudinary(account);
+
+
+            builder.Services.AddSingleton(cloudinary);
+
 
 
 

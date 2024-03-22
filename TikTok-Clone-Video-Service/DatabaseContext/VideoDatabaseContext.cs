@@ -8,7 +8,7 @@ namespace TikTok_Clone_Video_Service.DatabaseContext
 {
     public class VideoDatabaseContext : DbContext
     {
-        public DbSet<Video> Vdeos { get; set; }
+        public DbSet<Video> Videos { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

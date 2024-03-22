@@ -484,3 +484,5 @@ $RECYCLE.BIN/
 *.swp
 TikTok-Clone-Video-Service/appsettings.json
 TikTok-Clone-Video-Service/appsettings.Development.json
+TikTok-Clone-Video-Service/videoDatabase.db-shm
+TikTok-Clone-Video-Service/videoDatabase.db-wal
