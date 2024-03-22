@@ -1,6 +1,7 @@
 
 using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.Controllers;
+using TikTok_Clone_Video_Service.DatabaseContext;
 using TikTok_Clone_Video_Service.Services;
 
 namespace TikTok_Clone_Video_Service
@@ -20,6 +21,11 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddLogging();
             builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
             builder.Services.AddScoped<IRabbitMQPublisherService, RabbitMQPublisherService>();
+
+            using (var client = new VideoDatabaseContext())
+            {
+                client.Database.EnsureCreated();
+            }
 
 
 

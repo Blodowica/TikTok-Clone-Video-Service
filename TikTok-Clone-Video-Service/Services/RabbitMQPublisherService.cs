@@ -17,7 +17,7 @@ namespace TikTok_Clone_Video_Service.Services
         public RabbitMQPublisherService()
         {
             _connectionFactory = new ConnectionFactory{
-                HostName = "172.17.0.1", // Docker container IP address
+                HostName = "172.17.0.2", // Docker container IP address
                 Port = 5672,              // RabbitMQ default port
                 UserName = "guest",
                 Password = "guest"
@@ -31,7 +31,7 @@ namespace TikTok_Clone_Video_Service.Services
         {
             try
             {
-                if(message == null) { Console.WriteLine("The content of message seems to be empty"); }
+                if(message == null) { Console.WriteLine("The content of the message seems to be empty"); }
                 else
                 {
 
