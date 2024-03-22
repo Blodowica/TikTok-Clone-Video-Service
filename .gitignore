@@ -483,3 +483,4 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 TikTok-Clone-Video-Service/appsettings.json
+TikTok-Clone-Video-Service/appsettings.Development.json
