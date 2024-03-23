@@ -26,6 +26,7 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
             builder.Services.AddScoped<IRabbitMQPublisherService, RabbitMQPublisherService>();
             builder.Services.AddDbContext<VideoDatabaseContext>();
+            builder.Services.AddCors();
 
             
 
@@ -48,10 +49,17 @@ namespace TikTok_Clone_Video_Service
 
             builder.Services.AddSingleton(cloudinary);
 
-
+            //CORS Setup
+            
 
 
             var app = builder.Build();
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:3000", "*")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -63,7 +71,6 @@ namespace TikTok_Clone_Video_Service
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

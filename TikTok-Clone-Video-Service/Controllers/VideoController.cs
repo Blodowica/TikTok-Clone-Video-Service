@@ -37,13 +37,9 @@ namespace TikTok_Clone_Video_Service.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadVideo(IFormFile file)
-        {
-            string caption = "test caption";
-            bool isCommentDisabled = false;
-            string audience = "test aud";
-            int authorId = 22;
+        public async Task<IActionResult> UploadVideo(IFormFile file, [FromForm] string caption, [FromForm]bool isCommentsDisabled, [FromForm] string audience, [FromForm]int authorId)
 
+        { 
             try
             {
                 if (file == null || file.Length == 0)
@@ -70,7 +66,7 @@ namespace TikTok_Clone_Video_Service.Controllers
                 {
                     Caption = caption,
                     VideoURL = uploadResult.SecureUri.AbsoluteUri,
-                    IsCommentsDisabled = isCommentDisabled,
+                    IsCommentsDisabled = isCommentsDisabled,
                     Audience = audience,
                     AuthorId = authorId,
                     CloudinaryVideoId = uploadResult.PublicId,
@@ -99,7 +95,7 @@ namespace TikTok_Clone_Video_Service.Controllers
         {
             try
             {
-                if(publicVideoId == string.Empty)
+                if(string.IsNullOrEmpty(publicVideoId))
                 {
                     return BadRequest("The video publish id was empty");
                 }
@@ -160,7 +156,7 @@ namespace TikTok_Clone_Video_Service.Controllers
         }
 
 
-        [HttpDelete("/DeleteVideo")]
+        [HttpDelete("DeleteVideo")]
         public async Task<IActionResult> DeleteVideo(string publicVideoId)
         {
             try
