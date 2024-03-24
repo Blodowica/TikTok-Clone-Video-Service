@@ -113,6 +113,29 @@ namespace TikTok_Clone_Video_Service.Controllers
             }
 
         }
+        [HttpGet("GetAllVideos")]
+        public async Task<IActionResult> GetAllVideos()
+        {
+            try
+            {
+                // Retrieve all videos from your database (assuming you have a Videos DbSet)
+                var videos = await _dbContext.Videos
+                    .OrderByDescending(v => v.CreatedAt) // Sort by upload date (descending order)
+                    .ToListAsync();
+
+                if (videos == null || videos.Count == 0)
+                {
+                    return NotFound("No videos found.");
+                }
+
+                return Ok(videos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
 
 
         [HttpPut("UpdateVideo")]
