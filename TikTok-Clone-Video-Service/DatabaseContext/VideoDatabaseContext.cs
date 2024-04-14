@@ -20,18 +20,37 @@ namespace TikTok_Clone_Video_Service.DatabaseContext
             optionsBuilder.UseSqlite("Filename=videoDatabase.db");
         }
 
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //define the DB tables relationships
 
-            modelBuilder.Entity<Comment>()
-                .HasOne<Video>(c => c.Video)
-                .WithMany(v => v.Comments)
-                .HasForeignKey(c => c.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-             
-            
+            /*  modelBuilder.Entity<Comment>()
+              .HasOne(c => c.Video) // Each comment has one video
+
+              .WithMany(v => v.Comments) // Each video has many comments
+              .HasForeignKey(c => c.Id); // The foreign key in the Comment table is VideoId
+
+
+
+              modelBuilder.Entity<Comment>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+  */
+           /* modelBuilder.Entity<Comment>()
+                  .HasOne(c => c.Video)
+                  .WithMany(v => v.Comments)
+                  .HasForeignKey(c => c.VideoId);*/
+
+            modelBuilder.Entity<Video>()
+                 .HasMany(v => v.Comments)
+                 .WithOne(c => c.Video)
+                 .HasForeignKey(c => c.VideoId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                 
+
+
         }
     }
 

@@ -7,6 +7,7 @@ using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.Controllers;
 using TikTok_Clone_Video_Service.DatabaseContext;
 using TikTok_Clone_Video_Service.Services;
+using TikTok_Clone_Video_Service.SignalR;
 
 namespace TikTok_Clone_Video_Service
 {
@@ -27,7 +28,7 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddScoped<IRabbitMQPublisherService, RabbitMQPublisherService>();
             builder.Services.AddDbContext<VideoDatabaseContext>();
             builder.Services.AddCors();
-
+            builder.Services.AddSignalR();
             
 
             //Db context
@@ -73,6 +74,7 @@ namespace TikTok_Clone_Video_Service
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<VideoChatHub>("/commentHub");
 
             app.Run();
         }

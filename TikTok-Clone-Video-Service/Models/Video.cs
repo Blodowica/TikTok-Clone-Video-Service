@@ -1,4 +1,6 @@
-﻿namespace TikTok_Clone_Video_Service.Models
+﻿using System.Text.Json.Serialization;
+
+namespace TikTok_Clone_Video_Service.Models
 {
     public class Video
     {
@@ -19,7 +21,6 @@
         
          public DateTime CreatedAt {  get; set; }
          public DateTime UpdatedAt {  get; set; }
-
 
 
         public ICollection<Comment> Comments { get; set; }
