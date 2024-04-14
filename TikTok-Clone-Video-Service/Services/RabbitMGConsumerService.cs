@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,16 @@ namespace TikTok_Clone_User_Service.Services
         private readonly ConnectionFactory _connectionFactory;
         private readonly string _queueName;
 
-        public RabbitMQConsumerService()
+        public RabbitMQConsumerService(IConfiguration configuration)
         {
+          var rabbitMQConfig =  configuration.GetSection("CloudinarySettings");
+
             _connectionFactory = new ConnectionFactory
             {
-                HostName = "172.17.0.5", // Replace with your RabbitMQ Docker container IP address
-                Port = 5672,              // RabbitMQ default port
-                UserName = "guest",
-                Password = "guest"
+                HostName = rabbitMQConfig["Hostname"], // Replace with your RabbitMQ Docker container IP address
+                Port = Convert.ToInt32(rabbitMQConfig["Port"]) ,       // RabbitMQ default port
+                UserName = rabbitMQConfig["Username"],
+                Password = rabbitMQConfig["Password"]
             };
             _queueName = "UserPublishQueue";
         }
