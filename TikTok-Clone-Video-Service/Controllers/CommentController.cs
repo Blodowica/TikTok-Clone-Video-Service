@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using TikTok_Clone_Video_Service.DatabaseContext;
 using TikTok_Clone_Video_Service.DTO;
 using TikTok_Clone_Video_Service.Models;
+using TikTok_Clone_Video_Service.SignalR;
 
 namespace TikTok_Clone_Video_Service.Controllers
 {
@@ -13,9 +15,12 @@ namespace TikTok_Clone_Video_Service.Controllers
     {
 
         private readonly VideoDatabaseContext _dbContext;
-        public CommentController(VideoDatabaseContext videoDatabaseContext)
+        private readonly IHubContext<CommentHub> _hubContext;
+
+        public CommentController(VideoDatabaseContext videoDatabaseContext, IHubContext<CommentHub> hubContext)
         {
             _dbContext = videoDatabaseContext; 
+            _hubContext = hubContext;
         }
 
         [HttpPost("SendVideoComment")]
@@ -42,7 +47,12 @@ namespace TikTok_Clone_Video_Service.Controllers
 
                 _dbContext.Comments.Add(comment);
                 await _dbContext.SaveChangesAsync();
+               
+                await _hubContext.Clients.Group("1").SendAsync("RecieveComment", comment);
 
+
+               // await _hubContext.Clients.Group(comment.Video.Id.ToString()).SendAsync("RecieveComment", comment);
+                
             return Ok(comment);
             }
             catch (Exception ex)
@@ -84,7 +94,7 @@ namespace TikTok_Clone_Video_Service.Controllers
             }
         }
 
-        [HttpDelete("delteComment")]
+        [HttpDelete("deleteComment")]
         public async Task<IActionResult> deleteComment([FromBody] int commentId)
         {
 

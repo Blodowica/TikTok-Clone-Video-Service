@@ -59,7 +59,8 @@ namespace TikTok_Clone_Video_Service
             {
                 builder.WithOrigins("http://localhost:3000", "*")
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
             });
 
             // Configure the HTTP request pipeline.
@@ -67,6 +68,7 @@ namespace TikTok_Clone_Video_Service
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
@@ -74,7 +76,8 @@ namespace TikTok_Clone_Video_Service
             app.UseAuthorization();
 
             app.MapControllers();
-            app.MapHub<VideoChatHub>("/commentHub");
+            
+            app.MapHub<CommentHub>("/commentHub");
 
             app.Run();
         }
