@@ -9,6 +9,8 @@ namespace TikTok_Clone_Video_Service.Models
         public int Id { get; set; }
 
         public int AuthorId { get; set; }
+
+       // public string AuthorName { get; set; }
         
         public string Caption { get; set; }
         public string VideoURL { get; set; } 

@@ -49,8 +49,10 @@ namespace TikTok_Clone_Video_Service.Controllers
 
                 _dbContext.Comments.Add(comment);
                 await _dbContext.SaveChangesAsync();
+
+
                
-                await _hubContext.Clients.Group("1").SendAsync("RecieveComment", comment);
+                await _hubContext.Clients.Group(comment.VideoId.ToString()).SendAsync("RecieveComment", comment);
 
 
                // await _hubContext.Clients.Group(comment.Video.Id.ToString()).SendAsync("RecieveComment", comment);
