@@ -40,6 +40,8 @@ namespace TikTok_Clone_Video_Service.Controllers
                 Content = commentDTO.Content,
                 Created =  commentDTO.Created,
                 VideoId = commentDTO.VideoId,
+                UserId = commentDTO.UserId,
+               
                 
             };
 
