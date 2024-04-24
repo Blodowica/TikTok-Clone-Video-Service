@@ -136,6 +136,37 @@ namespace TikTok_Clone_Video_Service.Controllers
             }
         }
 
+        [HttpPut("likeVideo")]
+
+        public async Task<IActionResult> likeVideoById(int videoId)
+        {
+            try {
+            
+                if(videoId <= 0)  { return BadRequest("Error something went wrong: the video value was not correctly provided"); }
+                
+                //find video 
+                var video = await _dbContext.Videos.FindAsync(videoId);
+                if(video == null) { return NotFound("The video could not be found"); }
+
+                //find the user or sent the data to the user service TO DOOO LATER 
+
+                //check if the video is already like by the user 
+
+                //update the like 
+                video.Likes++;
+
+                _dbContext.SaveChanges();
+                return Ok("The video's like was successfully updated!");
+            
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        
+
 
 
         [HttpPut("UpdateVideo")]
