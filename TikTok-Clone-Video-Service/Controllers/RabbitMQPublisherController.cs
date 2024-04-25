@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TikTok_Clone_Video_Service.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using TikTok_Clone_Video_Service.DTO;
+using TikTok_Clone_Video_Service;
 
 namespace TikTok_Clone_Video_Service.Controllers
 {
@@ -8,23 +8,18 @@ namespace TikTok_Clone_Video_Service.Controllers
     [ApiController]
     public class RabbitMQPublisherController : ControllerBase
     {
-        private readonly IRabbitMQPublisherService _rabbitMQPublisherService;
-        
+        private readonly IRabbitMQService _rabbitMQService;
 
-        public RabbitMQPublisherController( IRabbitMQPublisherService rabbitMQPublisherController)
+        public RabbitMQPublisherController(IRabbitMQService rabbitMQService)
         {
-
-            
-            _rabbitMQPublisherService = rabbitMQPublisherController;
-
+            _rabbitMQService = rabbitMQService;
         }
 
         [HttpPost]
-        public  IActionResult SendVideoMessage([FromBody] string message)
+        public IActionResult SendVideoMessage([FromBody] CommentDTO comment)
         {
-             _rabbitMQPublisherService.sendMessage(message);
-            return Ok($"the message {message} has been sent");
-
+            _rabbitMQService.PublishMessage("comment_exchange", "testing_comment_queue", comment);
+            return Ok($"The message for comment {comment.Content} has been sent");
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Security.Principal;
 using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.Controllers;
 using TikTok_Clone_Video_Service.DatabaseContext;
-using TikTok_Clone_Video_Service.Services;
 using TikTok_Clone_Video_Service.SignalR;
 
 namespace TikTok_Clone_Video_Service
@@ -25,7 +24,7 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddSwaggerGen();
             builder.Services.AddLogging();
             builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
-            builder.Services.AddScoped<IRabbitMQPublisherService, RabbitMQPublisherService>();
+            builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
             builder.Services.AddDbContext<VideoDatabaseContext>();
             builder.Services.AddCors();
             builder.Services.AddSignalR();
@@ -82,4 +81,6 @@ namespace TikTok_Clone_Video_Service
             app.Run();
         }
     }
+
+    
 }

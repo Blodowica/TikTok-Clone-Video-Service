@@ -19,7 +19,7 @@ namespace TikTok_Clone_User_Service.Services
 
         public RabbitMQConsumerService(IConfiguration configuration)
         {
-          var rabbitMQConfig =  configuration.GetSection("CloudinarySettings");
+          var rabbitMQConfig =  configuration.GetSection("RabbitMQConfiguration");
 
             _connectionFactory = new ConnectionFactory
             {
