@@ -86,7 +86,7 @@ jobs:
           dotnet-version: 8.0.201
       
       - name: Restore dependencies
-        run: dotnet restore TikTok-Clone-User-Service
+        run: dotnet restore TikTok-Clone-Video-Service
       - name: Run Snyk to check for vulnerabilities
         run: |
           # Change directory to your project directory
