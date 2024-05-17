@@ -71,7 +71,7 @@ jobs:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           shell: powershell
           run: |
-            .\.sonar\scanner\dotnet-sonarscanner begin /k:"Blodowica-TikTok-Clone-Video-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+            .\.sonar\scanner\dotnet-sonarscanner begin /k:"Blodowica_TikTok-Clone-Video-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
             dotnet build TikTok-Clone-Video-Service/TikTok-Clone-Video-Service.csproj --no-incremental
             .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
