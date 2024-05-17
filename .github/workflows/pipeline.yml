@@ -21,9 +21,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore TikTok-Clone-Video-Service/TikTok-Clone-Video-Service.csproj
       
+     
       - name: Build
         working-directory: ./TikTok-Clone-Video-Service
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build TikTok-Clone-Video-Service.csproj --configuration Release --no-restore
       
       - name: Run Unit tests
         working-directory: ./TikTok-Clone-User-Service
