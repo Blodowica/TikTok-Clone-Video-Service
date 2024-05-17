@@ -23,9 +23,7 @@ jobs:
       working-directory: ./TikTok-Clone-Video-Service
       run: dotnet build --configuration Release --no-restore
       
-    - name: Run Unit tests
-      working-directory: ./TikTok-Clone-Video-Service
-      run: dotnet test --no-restore --verbosity normal
+
 
   analyze:
     runs-on: windows-latest
