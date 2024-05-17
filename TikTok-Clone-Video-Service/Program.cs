@@ -23,8 +23,8 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddLogging();
-            builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
-            builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
+           // builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
+           // builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
             builder.Services.AddDbContext<VideoDatabaseContext>();
             builder.Services.AddCors();
             builder.Services.AddSignalR();
