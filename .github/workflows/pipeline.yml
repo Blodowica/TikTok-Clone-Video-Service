@@ -18,7 +18,7 @@ jobs:
         dotnet-version: 8.0.201
     - name: Restore dependencies
       working-directory: ./TikTok-Clone-Video-Service
-      run: dotnet restore TikTok-Clone-Video-Service
+      run: dotnet restore .\TikTok-Clone-Video-Service.csproj
       
     - name: Build
       working-directory: ./TikTok-Clone-Video-Service
