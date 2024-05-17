@@ -71,7 +71,7 @@ jobs:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           shell: powershell
           run: |
-            .\.sonar\scanner\dotnet-sonarscanner begin /k:"Blodowica_TikTok-Clone-User-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+            .\.sonar\scanner\dotnet-sonarscanner begin /k:"Blodowica_TikTok-Clone-Video-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
             dotnet build TikTok-Clone-Video-Service/TikTok-Clone-Video-Service.csproj --no-incremental
             .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
@@ -90,7 +90,7 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         run: |
           # Change directory to your project directory
-          cd ././TikTok-Clone-User-Service
+          cd ././TikTok-Clone-Video-Service
           
           # Install Snyk CLI
           npm install -g snyk
@@ -104,6 +104,6 @@ jobs:
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ./TikTok-Clone-User-Service/snyk.sarif
+          sarif_file: ./TikTok-Clone-Video-Service/snyk.sarif
 
 
