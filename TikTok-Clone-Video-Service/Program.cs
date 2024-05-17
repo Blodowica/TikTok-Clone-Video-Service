@@ -44,6 +44,7 @@ namespace TikTok_Clone_Video_Service
               builder.Configuration["CloudinarySettings:ApiKey"],
               builder.Configuration["CloudinarySettings:ApiSecret"]));
 
+
             var cloudinary = new Cloudinary(account);
 
 
@@ -65,10 +66,10 @@ namespace TikTok_Clone_Video_Service
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
                 app.UseHsts();
             }
+                app.UseSwagger();
+                app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

@@ -13,6 +13,9 @@ public class RabbitMQService : IRabbitMQService
 
     public RabbitMQService(IConfiguration configuration)
     {
+        try
+        {
+
         var rabbitMQConfig = configuration.GetSection("RabbitMQConfiguration");
 
         _connectionFactory = new ConnectionFactory
@@ -22,6 +25,8 @@ public class RabbitMQService : IRabbitMQService
             UserName = rabbitMQConfig["Username"],
             Password = rabbitMQConfig["Password"]
         };
+        }
+        catch { }
     }
 
     public void PublishMessage<T>(string exchangeName, string routingKey,  T messageDto)
