@@ -23,19 +23,21 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddLogging();
-           // builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
-           // builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
-            builder.Services.AddDbContext<VideoDatabaseContext>();
+            // builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
+            // builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
+            builder.Services.AddDbContext<VideoDatabaseContext>(options =>
+      options.UseSqlServer(builder.Configuration.GetConnectionString("videoDatabase")));
+
             builder.Services.AddCors();
             builder.Services.AddSignalR();
             
 
             //Db context
-
+/*
             using (var client = new VideoDatabaseContext())
             {
                 client.Database.EnsureCreated();
-            }
+            }*/
 
 
             //Cloudindary
