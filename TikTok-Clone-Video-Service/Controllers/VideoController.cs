@@ -135,6 +135,33 @@ namespace TikTok_Clone_Video_Service.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        [HttpGet("GetAllVideosPaginated")]
+        public async Task<IActionResult> GetAllVideosPaginated(int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                // Calculate the number of items to skip based on the page number and page size
+                int skip = (pageNumber - 1) * pageSize;
+
+                // Retrieve a paginated list of videos from your database
+                var videos = await _dbContext.Videos
+                    .OrderByDescending(v => v.CreatedAt) // Sort by upload date (descending order)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                if (videos == null || videos.Count == 0)
+                {
+                    return NotFound("No videos found.");
+                }
+
+                return Ok(videos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
 
         [HttpPut("likeVideo")]
 
