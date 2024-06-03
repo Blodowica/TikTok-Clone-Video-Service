@@ -57,9 +57,11 @@ namespace TikTok_Clone_Video_Service
 
 
             var app = builder.Build();
+
+            var corsURL = builder.Configuration["AllowedCors"];           
             app.UseCors(builder =>
             {
-                builder.WithOrigins("http://localhost:3000", "*")
+                builder.WithOrigins(corsURL)
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
