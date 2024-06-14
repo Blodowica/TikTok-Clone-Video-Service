@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TikTok_Clone_Video_Service.DatabaseContext;
 
@@ -11,9 +12,11 @@ using TikTok_Clone_Video_Service.DatabaseContext;
 namespace TikTok_Clone_Video_Service.Migrations
 {
     [DbContext(typeof(VideoDatabaseContext))]
-    partial class VideoDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240614021806_updatedVideoTable")]
+    partial class updatedVideoTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,29 +55,7 @@ namespace TikTok_Clone_Video_Service.Migrations
 
                     b.HasIndex("VideoId");
 
-                    b.ToTable("Comments", (string)null);
-                });
-
-            modelBuilder.Entity("TikTok_Clone_Video_Service.Models.UserLikedVideos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("VideoID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("authID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoID");
-
-                    b.ToTable("UserLikedVideos", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.Video", b =>
@@ -122,7 +103,7 @@ namespace TikTok_Clone_Video_Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.Comment", b =>
@@ -136,22 +117,9 @@ namespace TikTok_Clone_Video_Service.Migrations
                     b.Navigation("Video");
                 });
 
-            modelBuilder.Entity("TikTok_Clone_Video_Service.Models.UserLikedVideos", b =>
-                {
-                    b.HasOne("TikTok_Clone_Video_Service.Models.Video", "Video")
-                        .WithMany("UserLikedVideos")
-                        .HasForeignKey("VideoID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
-                });
-
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.Video", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("UserLikedVideos");
                 });
 #pragma warning restore 612, 618
         }

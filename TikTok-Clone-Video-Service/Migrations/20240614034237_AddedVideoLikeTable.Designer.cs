@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TikTok_Clone_Video_Service.DatabaseContext;
 
@@ -11,9 +12,11 @@ using TikTok_Clone_Video_Service.DatabaseContext;
 namespace TikTok_Clone_Video_Service.Migrations
 {
     [DbContext(typeof(VideoDatabaseContext))]
-    partial class VideoDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240614034237_AddedVideoLikeTable")]
+    partial class AddedVideoLikeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +55,7 @@ namespace TikTok_Clone_Video_Service.Migrations
 
                     b.HasIndex("VideoId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.UserLikedVideos", b =>
@@ -74,7 +77,7 @@ namespace TikTok_Clone_Video_Service.Migrations
 
                     b.HasIndex("VideoID");
 
-                    b.ToTable("UserLikedVideos", (string)null);
+                    b.ToTable("UserLikedVideos");
                 });
 
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.Video", b =>
@@ -122,7 +125,7 @@ namespace TikTok_Clone_Video_Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("TikTok_Clone_Video_Service.Models.Comment", b =>

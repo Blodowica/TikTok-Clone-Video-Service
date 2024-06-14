@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using TikTok_Clone_Video_Service.DatabaseContext;
+using TikTok_Clone_Video_Service.DTO;
 using TikTok_Clone_Video_Service.Models;
 
 namespace TikTok_Clone_Video_Service.Controllers
@@ -37,12 +38,13 @@ namespace TikTok_Clone_Video_Service.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadVideo(IFormFile file, [FromForm] string caption, [FromForm]bool isCommentsDisabled, [FromForm] string audience, [FromForm]int authorId)
+        public async Task<IActionResult> UploadVideo([FromForm] VideoDTO videoDTO)
 
         { 
             try
             {
-                if (file == null || file.Length == 0)
+
+                if (videoDTO == null || videoDTO.file.Length == 0)
                 {
                     return BadRequest("No file uploaded.");
                 }
@@ -50,7 +52,7 @@ namespace TikTok_Clone_Video_Service.Controllers
                 // Upload video to Cloudinary
                 var uploadParams = new VideoUploadParams()
                 {
-                    File = new FileDescription(file.FileName, file.OpenReadStream())
+                    File = new FileDescription(videoDTO.file.FileName, videoDTO.file.OpenReadStream())
                 };
 
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
@@ -64,12 +66,14 @@ namespace TikTok_Clone_Video_Service.Controllers
                 // Save other data to your database
                 var video = new Models.Video
                 {
-                    Caption = caption,
+                    Caption = videoDTO.Caption,
                     VideoURL = uploadResult.SecureUri.AbsoluteUri,
-                    IsCommentsDisabled = isCommentsDisabled,
-                    Audience = audience,
-                    AuthorId = authorId,
+                    IsCommentsDisabled = videoDTO.IsCommentsDisabled,
+                    Audience = videoDTO.Audience,
+                    AuthorId = videoDTO.AuthorId,
+                    AuthorName = videoDTO.AuthorName,
                     CloudinaryVideoId = uploadResult.PublicId,
+                    UserLikedVideos = null,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
 
@@ -120,7 +124,9 @@ namespace TikTok_Clone_Video_Service.Controllers
             {
                 // Retrieve all videos from your database (assuming you have a Videos DbSet)
                 var videos = await _dbContext.Videos
-                    .OrderByDescending(v => v.CreatedAt) // Sort by upload date (descending order)
+                    .OrderByDescending(v => v.CreatedAt)
+                    .Include(v => v.UserLikedVideos)
+                    // Sort by upload date (descending order)
                     .ToListAsync();
 
                 if (videos == null || videos.Count == 0)
@@ -162,37 +168,81 @@ namespace TikTok_Clone_Video_Service.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
         [HttpPut("likeVideo")]
-
-        public async Task<IActionResult> likeVideoById(int videoId)
+        public async Task<IActionResult> LikeVideoById([FromForm] int videoId, [FromForm] string authID)
         {
-            try {
-            
-                if(videoId <= 0)  { return BadRequest("Error something went wrong: the video value was not correctly provided"); }
-                
-                //find video 
-                var video = await _dbContext.Videos.FindAsync(videoId);
-                if(video == null) { return NotFound("The video could not be found"); }
+            try
+            {
+                if (videoId <= 0)
+                {
+                    return BadRequest("Error: The video ID was not correctly provided.");
+                }
 
-                //find the user or sent the data to the user service TO DOOO LATER 
+                if (string.IsNullOrEmpty(authID))
+                {
+                    return BadRequest("Error: The auth ID was not provided.");
+                }
 
-                //check if the video is already like by the user 
+                // Find video with eager loading of UserLikedVideos
+                var video = await _dbContext.Videos
+                    .Include(v => v.UserLikedVideos)
+                    .FirstOrDefaultAsync(v => v.Id == videoId);
 
-                //update the like 
-                video.Likes++;
+                if (video == null)
+                {
+                    return NotFound("Error: The video could not be found.");
+                }
 
-                _dbContext.SaveChanges();
-                return Ok("The video's like was successfully updated!");
-            
+                // Initialize UserLikedVideos collection if null
+                video.UserLikedVideos ??= new List<UserLikedVideos>();
+
+                // Initialize the status variable
+                string status = "disliked"; // Default to "disliked"
+
+                // Check if the video is already liked by the user
+                bool alreadyLiked = video.UserLikedVideos.Any(alv => alv.authID == authID);
+                if (alreadyLiked)
+                {
+                    // User already liked the video, so unlike it
+                    var likedUser = video.UserLikedVideos.FirstOrDefault(e => e.authID == authID && e.VideoID == videoId);
+                    if (likedUser != null)
+                    {
+                        _dbContext.UserLikedVideos.Remove(likedUser);
+                        video.Likes--; // Decrement the like count
+                        status = "disliked"; // Set status to disliked
+                    }
+                }
+                else
+                {
+                    // User hasn't liked the video, so like it
+                    var likedUser = new UserLikedVideos { authID = authID, VideoID = videoId };
+                    video.UserLikedVideos.Add(likedUser);
+                    video.Likes++; // Increment the like count
+                    status = "liked"; // Set status to liked
+                }
+
+                // Save changes asynchronously
+                await _dbContext.SaveChangesAsync();
+
+                var response = new
+                {
+                    Status = status,
+                    NewLikeCount = video.Likes
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                // Log the exception details for debugging
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
 
-        
+
+
+
+
 
 
 

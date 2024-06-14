@@ -10,7 +10,7 @@ namespace TikTok_Clone_Video_Service.Models
 
         public int AuthorId { get; set; }
 
-       // public string AuthorName { get; set; }
+        public string AuthorName { get; set; }
         
         public string Caption { get; set; }
         public string VideoURL { get; set; } 
@@ -25,8 +25,9 @@ namespace TikTok_Clone_Video_Service.Models
          public DateTime UpdatedAt {  get; set; }
 
 
-        public ICollection<Comment> Comments { get; set; }
-       
+        public ICollection<Comment>? Comments { get; set; }
+
+        public ICollection<UserLikedVideos>? UserLikedVideos { get; set; } 
 
     }
 }

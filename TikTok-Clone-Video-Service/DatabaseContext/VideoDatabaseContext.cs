@@ -8,6 +8,8 @@ namespace TikTok_Clone_Video_Service.DatabaseContext
         public DbSet<Video> Videos { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
+        public DbSet<UserLikedVideos> UserLikedVideos { get; set; }
+
         public VideoDatabaseContext(DbContextOptions<VideoDatabaseContext> options)
             : base(options)
         {
@@ -17,9 +19,15 @@ namespace TikTok_Clone_Video_Service.DatabaseContext
         {
             modelBuilder.Entity<Video>()
                 .HasMany(v => v.Comments)
+
                 .WithOne(c => c.Video)
                 .HasForeignKey(c => c.VideoId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Video>().HasMany(v => v.UserLikedVideos)
+            .WithOne(e => e.Video)
+            .HasForeignKey(e => e.VideoID)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
