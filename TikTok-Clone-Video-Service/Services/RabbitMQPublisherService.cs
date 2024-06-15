@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
+using System;
 using System.Text;
 
 public interface IRabbitMQService
@@ -15,50 +17,59 @@ public class RabbitMQService : IRabbitMQService
     {
         try
         {
+            var rabbitMQConfig = configuration.GetSection("RabbitMQConfiguration");
 
-        var rabbitMQConfig = configuration.GetSection("RabbitMQConfiguration");
-
-        _connectionFactory = new ConnectionFactory
-        {
-            HostName = rabbitMQConfig["Hostname"],
-            Port = Convert.ToInt32(rabbitMQConfig["Port"]),
-            UserName = rabbitMQConfig["Username"],
-            Password = rabbitMQConfig["Password"]
-        };
+            _connectionFactory = new ConnectionFactory
+            {
+                HostName = rabbitMQConfig["Hostname"],
+                Port = Convert.ToInt32(rabbitMQConfig["Port"]),
+                UserName = rabbitMQConfig["Username"],
+                Password = rabbitMQConfig["Password"]
+            };
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing RabbitMQ connection: {ex.Message}");
+            throw;
+        }
     }
 
-    public void PublishMessage<T>(string exchangeName, string routingKey,  T messageDto)
+    public void PublishMessage<T>(string exchangeName, string queueName, T contentDto)
     {
-        var message = JsonConvert.SerializeObject(messageDto);
+        var message = JsonConvert.SerializeObject(contentDto);
 
         try
         {
-            if (message == null) { Console.WriteLine("The content of the message seems to be empty"); }
-            else
-            {
-                using var connection = _connectionFactory.CreateConnection();
-                using var channel = connection.CreateModel();
+            using var connection = _connectionFactory.CreateConnection();
+            using var channel = connection.CreateModel();
 
-                channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct);
+            // Declare the exchange if it doesn't exist with the desired properties
+            channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
 
-                var body = Encoding.UTF8.GetBytes(message);
+            //Declare the queue to ensure the queque exist 
+            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true;
 
-                channel.BasicPublish(exchange: exchangeName,
-                                     routingKey: routingKey,
-                                     basicProperties: properties,
-                                     body: body);
+            channel.QueueBind(queue: queueName, exchange: exchangeName, routingKey: queueName);
 
-                Console.WriteLine($" [x] Sent {message}");
-            }
+
+            var body = Encoding.UTF8.GetBytes(message);
+
+            var properties = channel.CreateBasicProperties();
+            properties.Persistent = true; // Ensure messages are persistent
+
+            // Publish the message to the exchange
+            channel.BasicPublish(exchange: exchangeName,
+                                 routingKey: queueName,
+                                 basicProperties: properties,
+                                 body: body);
+
+            Console.WriteLine($" [x] Sent {message}");
         }
-        catch
+        catch (Exception ex)
         {
-            throw new Exception("Error something went wrong");
+            Console.WriteLine($"Error publishing message to RabbitMQ: {ex.Message}");
+            throw;
         }
     }
 }

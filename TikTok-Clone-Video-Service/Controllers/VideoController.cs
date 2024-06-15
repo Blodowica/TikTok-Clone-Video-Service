@@ -19,9 +19,10 @@ namespace TikTok_Clone_Video_Service.Controllers
     {
         private readonly Cloudinary _cloudinary;
         private readonly VideoDatabaseContext _dbContext;
+        private readonly IRabbitMQService _rabbitMQService;
         private readonly IConfiguration _configuration;
 
-        public VideoController(Cloudinary cloudinary, VideoDatabaseContext dbContext, IConfiguration configuration)
+        public VideoController(Cloudinary cloudinary, VideoDatabaseContext dbContext, IConfiguration configuration, IRabbitMQService rabbitMQService)
         {
             _cloudinary = cloudinary;
             _dbContext = dbContext;
@@ -35,6 +36,7 @@ namespace TikTok_Clone_Video_Service.Controllers
             var account = new Account(cloudName, apiKey, apiSecret);
 
             _cloudinary = new Cloudinary(account);
+            _rabbitMQService = rabbitMQService;
         }
 
         [HttpPost("upload")]
@@ -193,13 +195,13 @@ namespace TikTok_Clone_Video_Service.Controllers
                     return NotFound("Error: The video could not be found.");
                 }
 
-                // Initialize UserLikedVideos collection if null
+             
                 video.UserLikedVideos ??= new List<UserLikedVideos>();
 
                 // Initialize the status variable
                 string status = "disliked"; // Default to "disliked"
 
-                // Check if the video is already liked by the user
+                
                 bool alreadyLiked = video.UserLikedVideos.Any(alv => alv.authID == authID);
                 if (alreadyLiked)
                 {
@@ -210,6 +212,9 @@ namespace TikTok_Clone_Video_Service.Controllers
                         _dbContext.UserLikedVideos.Remove(likedUser);
                         video.Likes--; // Decrement the like count
                         status = "disliked"; // Set status to disliked
+                       
+                        
+                        
                     }
                 }
                 else
@@ -223,6 +228,14 @@ namespace TikTok_Clone_Video_Service.Controllers
 
                 // Save changes asynchronously
                 await _dbContext.SaveChangesAsync();
+
+                var messageDTO = new
+                {
+                    authID = authID,
+                    videoId = videoId,
+                    status = status,
+                };
+                  _rabbitMQService.PublishMessage("video_exchange", "like_video_queue", messageDTO);
 
                 var response = new
                 {

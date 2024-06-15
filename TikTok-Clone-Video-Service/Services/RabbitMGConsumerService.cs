@@ -39,7 +39,7 @@ namespace TikTok_Clone_User_Service.Services
             using (var channel = connection.CreateModel())
             {
                 channel.QueueDeclare(queue: _queueName,
-                                     durable: true,
+                                     durable: false,
                                      exclusive: false,
                                      autoDelete: false,
                                      arguments: null);
