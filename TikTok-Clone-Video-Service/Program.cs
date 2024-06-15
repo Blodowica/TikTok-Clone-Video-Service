@@ -2,10 +2,12 @@
 using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 using System.Security.Principal;
 using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.Controllers;
 using TikTok_Clone_Video_Service.DatabaseContext;
+using TikTok_Clone_Video_Service.Interfaces;
 using TikTok_Clone_Video_Service.SignalR;
 
 namespace TikTok_Clone_Video_Service
@@ -23,8 +25,9 @@ namespace TikTok_Clone_Video_Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddLogging();
-            builder.Services.AddScoped<IRabbitMQConsumerService, RabbitMQConsumerService>();
-             builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
+            builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
+            builder.Services.AddScoped<IUploadVideoService, UploadVideoService>();
+
 
 
             builder.Services.AddDbContext<VideoDatabaseContext>(options =>
@@ -32,15 +35,6 @@ namespace TikTok_Clone_Video_Service
 
             builder.Services.AddCors();
             builder.Services.AddSignalR();
-            
-
-            //Db context
-/*
-            using (var client = new VideoDatabaseContext())
-            {
-                client.Database.EnsureCreated();
-            }*/
-
 
             //Cloudindary
             var account =( new Account(
@@ -48,17 +42,15 @@ namespace TikTok_Clone_Video_Service
               builder.Configuration["CloudinarySettings:ApiKey"],
               builder.Configuration["CloudinarySettings:ApiSecret"]));
 
-
             var cloudinary = new Cloudinary(account);
 
 
             builder.Services.AddSingleton(cloudinary);
 
-            //CORS Setup
-            
+            //configure and start rabbitmq service
+            ConfigureRabbitMQ(builder);
 
-
-            var app = builder.Build();
+                var app = builder.Build();
 
             var corsURL = builder.Configuration["AllowedCors"];           
             app.UseCors(builder =>
@@ -86,6 +78,33 @@ namespace TikTok_Clone_Video_Service
             app.MapHub<CommentHub>("/commentHub");
 
             app.Run();
+        }
+        private static void ConfigureRabbitMQ(WebApplicationBuilder builder)
+        {
+            try
+            {
+                var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQConfiguration");
+                var connectionFactory = new ConnectionFactory
+                {
+                    HostName = rabbitMQConfig["Hostname"],
+                    Port = Convert.ToInt32(rabbitMQConfig["Port"]),
+                    UserName = rabbitMQConfig["Username"],
+                    Password = rabbitMQConfig["Password"],
+                    VirtualHost = rabbitMQConfig["Virtualhost"]
+                };
+
+                // Register RabbitMQ services
+
+                builder.Services.AddSingleton(connectionFactory);
+                builder.Services.AddHostedService(provider =>
+                    new RabbitMQConsumer(connectionFactory, provider.GetRequiredService<IServiceProvider>(), "video_exchange", "upload_video_queue"));
+            }
+            catch (Exception ex)
+            {
+                // Handle RabbitMQ configuration exception
+                Console.WriteLine($"Failed to configure RabbitMQ: {ex.Message}");
+                throw;
+            }
         }
     }
 

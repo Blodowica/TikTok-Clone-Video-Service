@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TikTok_Clone_Video_Service.DTO;
+using TikTok_Clone_Video_Service.Interfaces;
 using TikTok_Clone_Video_Service.Models;
 
 namespace TikTok_Clone_Video_Service.Controllers

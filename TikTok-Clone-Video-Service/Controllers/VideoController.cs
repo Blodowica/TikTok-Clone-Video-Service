@@ -7,8 +7,10 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TikTok_Clone_User_Service.Services;
 using TikTok_Clone_Video_Service.DatabaseContext;
 using TikTok_Clone_Video_Service.DTO;
+using TikTok_Clone_Video_Service.Interfaces;
 using TikTok_Clone_Video_Service.Models;
 
 namespace TikTok_Clone_Video_Service.Controllers
@@ -21,6 +23,7 @@ namespace TikTok_Clone_Video_Service.Controllers
         private readonly VideoDatabaseContext _dbContext;
         private readonly IRabbitMQService _rabbitMQService;
         private readonly IConfiguration _configuration;
+
 
         public VideoController(Cloudinary cloudinary, VideoDatabaseContext dbContext, IConfiguration configuration, IRabbitMQService rabbitMQService)
         {
@@ -46,7 +49,7 @@ namespace TikTok_Clone_Video_Service.Controllers
             try
             {
 
-                if (videoDTO == null || videoDTO.file.Length == 0)
+                if (videoDTO == null || videoDTO.File.Length == 0)
                 {
                     return BadRequest("No file uploaded.");
                 }
@@ -54,7 +57,7 @@ namespace TikTok_Clone_Video_Service.Controllers
                 // Upload video to Cloudinary
                 var uploadParams = new VideoUploadParams()
                 {
-                    File = new FileDescription(videoDTO.file.FileName, videoDTO.file.OpenReadStream())
+                    File = new FileDescription(videoDTO.File.FileName, videoDTO.File.OpenReadStream())
                 };
 
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
@@ -91,6 +94,48 @@ namespace TikTok_Clone_Video_Service.Controllers
             catch (Exception ex)
             {
                 // Log the exception details
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("uploadToQueue")]
+        public async Task<IActionResult> UploadVideoToQueue([FromForm] VideoDTO videoDTO)
+        {
+            try
+            {
+                if (videoDTO == null || videoDTO.File == null || videoDTO.File.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                byte[] videoBytes;
+
+                // turn the video file into a byte array
+                using (var memoryStream = new MemoryStream())
+                {
+                    await videoDTO.File.CopyToAsync(memoryStream);
+                    videoBytes = memoryStream.ToArray();
+                }
+
+                var videoEncodedDto = new VideoEncodedDTO
+                {
+                    Audience = videoDTO.Audience,
+                    AuthorId = videoDTO.AuthorId,
+                    AuthorName = videoDTO.AuthorName,
+                    Caption = videoDTO.Caption,
+                    IsCommentsDisabled = videoDTO.IsCommentsDisabled,
+                    FileBytes = videoBytes,
+                    Filetype = videoDTO.File.ContentType
+                };
+
+
+              
+                _rabbitMQService.PublishMessage("video_exchange", "upload_video_queue", videoEncodedDto);
+
+                return Ok("Video is being uploaded.");
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
@@ -260,7 +305,7 @@ namespace TikTok_Clone_Video_Service.Controllers
 
 
         [HttpPut("UpdateVideo")]
-        public async Task<IActionResult> updateVideoMetaData(string publishId, string caption = null, bool isCommentsDisabled = false, string audience = null   )
+        public async Task<IActionResult> updateVideoMetaData(string publishId, string caption = "", bool isCommentsDisabled = false, string audience = null   )
         {
 
             try

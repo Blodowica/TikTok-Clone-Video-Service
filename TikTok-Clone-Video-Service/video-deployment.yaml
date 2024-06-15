@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: video
+  template:
+    metadata:
+      labels:
+        app: video
+    spec:
+      containers:
+      - name: video
+        image: k3d-myregistry.localhost:5000/tiktok-video-service:latest
+
+        ports:
+        - containerPort: 8081

@@ -1,11 +1,9 @@
-﻿using TikTok_Clone_Video_Service.Models;
-
-namespace TikTok_Clone_Video_Service.DTO
+﻿namespace TikTok_Clone_Video_Service.DTO
 {
-    public class VideoDTO
+    public class VideoEncodedDTO
     {
-       public required  IFormFile File { get; set; }
-
+        public byte[]? FileBytes { get; set; }
+        public string? Filetype { get; set; }  
 
         public required string Caption { get; set; }
 
@@ -13,8 +11,5 @@ namespace TikTok_Clone_Video_Service.DTO
         public required string Audience { get; set; }
         public required int AuthorId { get; set; }
         public required string AuthorName { get; set; }
-
-        public ICollection<UserLikedVideos>? LikedusersID { get; set; } 
-
     }
 }

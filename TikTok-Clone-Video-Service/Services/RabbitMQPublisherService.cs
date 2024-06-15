@@ -3,11 +3,9 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using System;
 using System.Text;
+using TikTok_Clone_Video_Service.Interfaces;
 
-public interface IRabbitMQService
-{
-    void PublishMessage<T>(string exchangeName, string routingKey, T messageDto);
-}
+
 
 public class RabbitMQService : IRabbitMQService
 {
@@ -24,7 +22,8 @@ public class RabbitMQService : IRabbitMQService
                 HostName = rabbitMQConfig["Hostname"],
                 Port = Convert.ToInt32(rabbitMQConfig["Port"]),
                 UserName = rabbitMQConfig["Username"],
-                Password = rabbitMQConfig["Password"]
+                Password = rabbitMQConfig["Password"],
+                VirtualHost = rabbitMQConfig["Virtualhost"]
             };
         }
         catch (Exception ex)
@@ -64,7 +63,7 @@ public class RabbitMQService : IRabbitMQService
                                  basicProperties: properties,
                                  body: body);
 
-            Console.WriteLine($" [x] Sent {message}");
+            Console.WriteLine($" [x] Sent MESSAGE to {queueName}");
         }
         catch (Exception ex)
         {
