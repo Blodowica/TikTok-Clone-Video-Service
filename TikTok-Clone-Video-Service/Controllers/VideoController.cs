@@ -331,6 +331,51 @@ namespace TikTok_Clone_Video_Service.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        [HttpDelete("DeleteAllVideosByUserId")]
+        public async Task<IActionResult> DeleteAllVideosByUserId(int userId)
+        {
+            try
+            {
+                if (userId <= 0)
+                {
+                    return BadRequest("User ID is required.");
+                }
 
+                // Find all videos by userId
+                var userVideos = await _dbContext.Videos.Where(v => v.AuthorId == userId).ToListAsync();
+
+                if (userVideos == null || userVideos.Count == 0)
+                {
+                    return NotFound("No videos found for this user.");
+                }
+
+                // Delete each video from Cloudinary and the database
+                foreach (var video in userVideos)
+                {
+                    var deletionParams = new DeletionParams(video.CloudinaryVideoId)
+                    {
+                        ResourceType = ResourceType.Video
+                    };
+
+                    var deleteResult = await _cloudinary.DestroyAsync(deletionParams);
+
+                    if (deleteResult.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        return StatusCode(500, $"Failed to delete video {video.CloudinaryVideoId} from Cloudinary.");
+                    }
+
+                    _dbContext.Videos.Remove(video);
+                }
+
+                await _dbContext.SaveChangesAsync();
+
+                return Ok("All videos for the user have been deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 }
+
